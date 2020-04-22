@@ -85,7 +85,46 @@ def process_registration():
 @app.route('/projects')
 def projects():
     """Display projects page"""
+    projects = db.session.query(Projects)
     return render_template("projects.html")
+
+@app.route('/account')
+def account():
+    """Display Account page"""
+    if session.get('email'):
+        customers = db.session.query(customer).filter(customer.email == session['email']).one()
+        return render_template("account.html", customers = customers)
+    else:
+        flash('Please login')
+        return redirect('/')
+
+@app.route('/create')
+def create():
+    """create new project"""
+    if session.get('email'):
+        customers = db.session.query(customer).filter(customer.email == session['email']).one()
+        return render_template("create_new.html", customers = customers)
+    else:
+        flash('Please login')
+        return redirect('/')
+
+
+@app.route('/create_project', methods=['POST'])
+def create_project():
+    """Process user project creation"""
+
+    user_id = db.session.query(customer).filter(customer.email == session['email']).one()
+    project_name = request.form.get("project_name")
+    project_description = request.form.get("project_description")
+    project_completed = 0
+    new_project = Projects(user_id = user_id.user_id, project_name = project_name, project_description = project_description, project_completed = project_completed)
+    print("hello")
+    db.session.add(new_project)
+    db.session.commit()
+    flash('Project Created')
+    return redirect("/")
+
+
 
 
 if __name__ == "__main__":
@@ -94,7 +133,5 @@ if __name__ == "__main__":
     connect_to_db(app)
     # Use the DebugToolbar
     # DebugToolbarExtension(app)
-    user = db.session.query(customer).filter(customer.user_id == 1).first()
-    print(user)
 
     app.run(host="0.0.0.0")

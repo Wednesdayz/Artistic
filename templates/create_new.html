@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+
+{% block body %}
+<div class="container">
+    <div style="text-align:center">
+    <div class="row">
+            <h1>Register</h1>
+                <form action="/create_project" id="create_project_form" method="POST">
+                    <label for="project_name">Project Name:</label><br></br>
+                    <input type="text" name="project_name" id="project_name" required><br></br>
+                    <label for="project_description">Project Description</label><br></br>
+                    <textarea id="project_description" name="project_description" placeholder="write something.." style="height:170pxt"></textarea><br></br>
+                    <input type="submit" value="Create">  
+                </form>
+    </div>
+    </div>
+</div>
+
+{% endblock %}

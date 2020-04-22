@@ -27,7 +27,7 @@ class customer(db.Model):
     dislikes = db.Column(db.Integer,nullable=True,default=0)
     reviews = db.relationship("Reviews", backref="customers")
     projects = db.relationship("Projects", backref="customers")
-
+    
     def __repr__(self):
 
         return "<Customer id={}, first_name={}, last_name={}, email={}>".format(self.user_id,
