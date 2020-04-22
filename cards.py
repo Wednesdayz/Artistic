@@ -1,7 +1,7 @@
 """Card model and controller"""
 
 from datetime import datetime, timezone
-from database import db
+from models import db
 
 class Card(db.Model): # pylint: disable=too-few-public-methods
     """SQLAlchemy card class"""

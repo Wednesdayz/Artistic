@@ -3,10 +3,12 @@ from sqlalchemy_utils import ArrowType
 from sqlalchemy import create_engine 
 import arrow
 from flask import Flask, render_template, redirect, request, flash, abort, session, jsonify
+from datetime import datetime, timezone
 
 db = SQLAlchemy()
 app = Flask(__name__)
 app.secret_key = 'Bbklct321'
+
 
 class customer(db.Model):
     """List of customers"""
@@ -27,7 +29,7 @@ class customer(db.Model):
     dislikes = db.Column(db.Integer,nullable=True,default=0)
     reviews = db.relationship("Reviews", backref="customers")
     projects = db.relationship("Projects", backref="customers")
-    
+
     def __repr__(self):
 
         return "<Customer id={}, first_name={}, last_name={}, email={}>".format(self.user_id,
@@ -60,6 +62,8 @@ def connect_to_db(app, database='postgresql://postgres:Bbklct321@localhost:5432/
     # Configure to use PostgreSQL database
     app.config['SQLALCHEMY_DATABASE_URI'] = database
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+    app.config['kanban.columns'] = ['To Do', 'Doing', 'Done']
+    app.app_context().push()
     db.app = app
     db.init_app(app)
 
