@@ -22,9 +22,9 @@ class customer(db.Model):
     state = db.Column(db.String(10), nullable=True)
     phone = db.Column(db.String(30), nullable=True)
     country = db.Column(db.String(500), nullable=False)
-    honour_points = db.Column(db.Integer, nullable=False)
-    likes = db.Column(db.Integer,nullable=False,default=0)
-    dislikes = db.Column(db.Integer,nullable=False,default=0)
+    honour_points = db.Column(db.Integer, nullable=True,default=100)
+    likes = db.Column(db.Integer,nullable=True,default=0)
+    dislikes = db.Column(db.Integer,nullable=True,default=0)
     reviews = db.relationship("Reviews", backref="customers")
     projects = db.relationship("Projects", backref="customers")
 
@@ -46,7 +46,7 @@ class Projects(db.Model):
 
 class Reviews(db.Model):
     review_id = db.Column(db.Integer, nullable = False, primary_key = True )
-    user_id = db.Column(db.Integer, db.ForeignKey("customers.user_id"), nullable=False)
+    user_id = db.Column(db.Integer, nullable=False)
     maker_id = db.Column(db.Integer, db.ForeignKey("customers.user_id"), nullable=False)
     description = db.Column(db.String(10000), nullable = True)
     recommend = db.Column(db.String(1000), nullable=False)
