@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block body %}
+
+<div class="row">
+    <div class="col-xs-12 col-sm-6 col-md-5 col-md-offset-1" >
+        <img src="/static/img/{{project.save_name}}" style="width:50%;height:50%;">
+    </div>
+    <div class="col-xs-12 col-sm-6 col-md-5">
+        <h1 style= "text-align:center;">{{ project.project_name }}</h1>
+        <p style="text-align:center;">{{ project.project_description }}</p><br><br><br><br> 
+    </div>
+    <div class="col-xs-12 col-sm-6 col-md-5">
+        <h1 style= "text-align:center;">Contributors</h1>
+        {%for con in project.contributors%}
+            {{con.first_name + ' ' + con.last_name}}
+        {%endfor%}
+    
+    </div>
+</div>
+
+<html>
+    <form action="/review">
+        <div class="rate">
+            <input type="radio" id="star5" name="rate" value="5" />
+            <label for="star5" title="text">5 stars</label>
+            <input type="radio" id="star4" name="rate" value="4" />
+            <label for="star4" title="text">4 stars</label>
+            <input type="radio" id="star3" name="rate" value="3" />
+            <label for="star3" title="text">3 stars</label>
+            <input type="radio" id="star2" name="rate" value="2" />
+            <label for="star2" title="text">2 stars</label>
+            <input type="radio" id="star1" name="rate" value="1" />
+            <label for="star1" title="text">1 star</label>
+        </div>
+    </form>
+
+</html>
+
+
+
+{% endblock %}

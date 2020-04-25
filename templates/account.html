@@ -9,7 +9,7 @@
 <!-- <h1 class="centerme">User Profile</h1> -->
 <div class="spacer"></div>
 <div class="row">
-<div class="col-md-4 col-md-offset-1">
+<div class="col-md-24 col-md-offset-1">
 
 <div class="spacer"></div>
 <h3>My Account</h3>
@@ -17,23 +17,64 @@
 <p>{{ customers.first_name }} {{ customers.last_name }}<br>
 {{ customers.email }}<br>
 </p>
-<p><a href="/create" class="btn btn-primary">Create Project</a></p><br>
-<p><a href="/KanbanBoard" class="btn btn-primary">Kanban Board</a></p>
+<a href="/create" class="btn btn-primary">Create Project</a></p>
 
-</div>
-<div class="col-md-6">
+<div class="col-md-16">
 
-{% for project in customers.projects %}
+    <table class="table table-hover">
+        <tr>
+            <th>Project Thumbnail</th>
+            <th>Project Number</th>
+            <th>Project Name </th> 
+            <th>Date created</th>
+            <th>Last modified</th>
+            <th>Contributers</th>
+            <th>Public or private</th>
+            <th>Kanban Board</th>
+            <th>Status</th>
+            <th>Deadline</th>
+        </tr>
+        {% if projects %}
+            {% for pro in projects %}
 
-    <tr>
-        <td> {{ project.project_id }}</td><br>
-        <td> {{project.project_name }}</td><br>
-        <td>{{ project.project_description}}</td><br>
-        <br>
-    </tr>
+                <tr>
+                    <td ><a href="/projects/{{ pro.project_id }}"><img src="/static/img/{{pro.save_name}}" class = "account_table"></a></td>
+                    <td><a href="/projects/{{ pro.project_id }}"> {{pro.project_id}}</a></td>
+                    <td><a href="/projects/{{ pro.project_id }}"> {{pro.project_name}}</a></td>
+                    <td> {{pro.date_created.strftime('%Y-%m-%d')}}</td>
+                    <td> {{pro.modified.strftime('%Y-%m-%d')}}</td>
+                    <td> {{ customers.first_name + ' ' + customers.last_name }} </td>
+                    <td> {% if pro.public == false %} 
+                                private
+                        {% else %}
+                                public
+                            {% endif %}
+                    </td>
+                    <td>
+                        <a href="/KanbanBoard/{{pro.project_id}}" class="button">Kanban Board</a>
+                    </td>
+                    <td>
+                        {% if pro.project_completed == 0 %}
+                            In progress
+                        {% else %}
+                            Completed
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if pro.deadLine == None %}
+                            None
+                        {% else %}
+                            {{pro.deadLine.strftime('%Y-%m-%d')}}
+                        {%endif%}
+                    </td>
+                </tr>
 
-{% endfor %}
-
+            {% endfor %}
+        {%endif%}
+    </table>
+    
+    <small>Questions about your order? Contact customer service at ######## and reference your order number.</small>
+    </div>
 </div>
 
 

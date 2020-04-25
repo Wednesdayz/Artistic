@@ -6,11 +6,14 @@ import os
 from jinja2 import StrictUndefined
 from models import *
 from passlib.hash import pbkdf2_sha256
-import cards
+from werkzeug import secure_filename
 
+
+UPLOAD_FOLDER = os.path.join('static/img')
+ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 app = Flask(__name__)
 app.secret_key = 'Bbklct321'
-
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.jinja_env.undefined = StrictUndefined
 app.jinja_env.auto_reload = True
 
@@ -85,18 +88,33 @@ def process_registration():
         flash("Please enable cookies to log in")
 
     return redirect("/")
+
 @app.route('/projects')
 def projects():
     """Display projects page"""
     projects = db.session.query(Projects)
     return render_template("projects.html", projects = projects)
 
+@app.route('/projects/<int:project_id>')  # takes product_id as an INTEGER
+def show_project_page(project_id):
+    """Query database for product info and display results"""
+
+    pro = Projects.query.get(project_id)
+
+    return render_template("projects_page.html", project=pro)
+
+@app.route('/review')
+def addReview():
+    """Add review to project"""
+    pass
+
 @app.route('/account')
 def account():
     """Display Account page"""
     if session.get('email'):
         customers = db.session.query(customer).filter(customer.email == session['email']).one()
-        return render_template("account.html", customers = customers)
+        projects = db.session.query(Projects).filter(Projects.user_id == customers.user_id)
+        return render_template("account.html", customers = customers, projects = projects)
     else:
         flash('Please login')
         return redirect('/')
@@ -112,92 +130,26 @@ def create():
         return redirect('/')
 
 
-@app.route('/create_project', methods=['POST'])
+@app.route('/create_project', methods=['GET', 'POST'])
 def create_project():
     """Process user project creation"""
-
+    if request.method == 'POST':
+      f = request.files['file']
+      f.save(os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(f.filename)))
+      name = secure_filename(f.filename)
     user_id = db.session.query(customer).filter(customer.email == session['email']).one()
     project_name = request.form.get("project_name")
     project_description = request.form.get("project_description")
     project_completed = 0
-    new_project = Projects(user_id = user_id.user_id, project_name = project_name, project_description = project_description, project_completed = project_completed)
+    public = request.form.get("public")
+    deadLine = request.form.get("deadLine")
+    
+    new_project = Projects(user_id = user_id.user_id, project_name = project_name, project_description = project_description, project_completed = project_completed, save_name = name, deadLine = deadLine)
     print("hello")
     db.session.add(new_project)
     db.session.commit()
     flash('Project Created')
     return redirect("/")
-
-
-@app.route('/KanbanBoard')
-def index():
-    """Serve the main index page"""
-    return send_from_directory('templates', 'kanban.html')
-
-@app.route('/static/<path:path>')
-def static_file(path):
-    """Serve files from the static directory"""
-    return send_from_directory('static', path)
-
-@app.route('/cards')
-def get_cards():
-    """Get an order list of cards"""
-    return json.dumps(cards.all_cards())
-
-@app.route('/columns')
-def get_columns():
-    """Get all valid columns"""
-    return json.dumps(app.config.get('kanban.columns'))
-
-@app.route('/card', methods=['POST'])
-def create_card():
-    """Create a new card"""
-
-    # TODO: validation
-    cards.create_card(
-        text=request.form.get('text'),
-        column=request.form.get('column', app.config.get('kanban.columns')[0]),
-        color=request.form.get('color', None),
-    )
-
-    # TODO: handle errors
-    return 'Success'
-
-@app.route('/card/reorder', methods=["POST"])
-def order_cards():
-    """Reorder cards by moving a single card
-    The JSON payload should have a 'card' and 'before' attributes where card is
-    the card ID to move and before is the card id it should be moved in front
-    of. For example:
-      {
-        "card": 3,
-        "before": 5,
-      }
-    "before" may also be "all" or null to move the card to the beginning or end
-    of the list.
-    """
-    cards.order_cards(request.get_json())
-    return 'Success'
-
-
-@app.route('/card/<int:card_id>', methods=['PUT'])
-def update_card(card_id):
-    """Update an existing card, the JSON payload may be partial"""
-
-    # TODO: handle errors
-    cards.update_card(card_id, request.get_json(), app.config.get('kanban.columns'))
-
-    return 'Success'
-
-@app.route('/card/<int:card_id>', methods=['DELETE'])
-def delete_card(card_id):
-    """Delete a card by ID"""
-
-    # TODO: handle errors
-    cards.delete_card(card_id)
-    return 'Success'
-
-
-
 
 if __name__ == "__main__":
     # Change app.debug to False before launch
