@@ -9,6 +9,20 @@ from passlib.hash import pbkdf2_sha256
 from werkzeug import secure_filename
 
 
+app = Flask(__name__)
+app.secret_key = 'Bbklct321'
+
+mail_settings = {
+    "MAIL_SERVER": 'smtp.gmail.com',
+    "MAIL_PORT": 465,
+    "MAIL_USE_TLS": False,
+    "MAIL_USE_SSL": True,
+    "MAIL_USERNAME": 'jason.z.m.wen',
+    "MAIL_PASSWORD": 'Ooblookoo21'
+}
+app.config.update(mail_settings)
+mail = Mail(app)
+
 UPLOAD_FOLDER = os.path.join('static/img')
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 app = Flask(__name__)
@@ -108,6 +122,45 @@ def addReview():
     """Add review to project"""
     pass
 
+@app.route('/contacts')
+def contactUs():
+    return render_template('contact_us.html')
+
+@app.route('/contacts', methods=['POST'])
+def process_email():
+
+    email = request.form.get('email')
+    first_name = request.form.get('firstname')
+    last_name = request.form.get('lastname')
+    country = request.form.get('country')
+    subject = request.form.get('subject')
+
+    with app.app_context():
+        email_list = []
+        email_list.append('jason.z.m.wen@hotmail.com')
+        msg = Message(subject="Hello",
+                        sender=app.config.get("MAIL_USERNAME"),
+                        recipients=email_list, # replace with your email for testing
+                        body="Email sent by: {} {}, from: {}, {} Via email: {}".format(first_name, last_name, country, subject, email)
+        )
+        mail.send(msg) 
+    
+    flash('Email Sent')
+    return redirect('/Contacts')
+
+@app.route('/Kanbanboard')
+def kanban():
+    return render_template("kanban.html")
+
+@app.route('/search')
+def show_search_results():
+    """Query database for search results"""
+
+    terms = request.args.get("terms").title()
+    projects = db.session.query(Projects).filter(Projects.project_name.like('%' + terms + '%')).all()
+
+    return render_template("projects.html", projects=projects)
+
 @app.route('/account')
 def account():
     """Display Account page"""
@@ -128,6 +181,17 @@ def create():
     else:
         flash('Please login')
         return redirect('/')
+
+@app.route('/profile')
+def profilePage():
+    """Designer Profile"""
+    if session.get('email'):
+        customers = db.session.query(customer).filter(customer.email == session['email']).one()
+        return render_template("create_new.html", customers = customers)
+    else:
+        flash('Please login')
+        return redirect('/')
+
 
 
 @app.route('/create_project', methods=['GET', 'POST'])
@@ -153,6 +217,7 @@ def create_project():
 
 if __name__ == "__main__":
     # Change app.debug to False before launch
+    mail.init_app(app)
     app.debug = True
     connect_to_db(app)
     # Use the DebugToolbar

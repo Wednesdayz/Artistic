@@ -37,6 +37,8 @@ class customer(db.Model):
                                                                                 self.first_name,
                                                                                 self.last_name,
                                                                                 self.email)
+
+
 class Projects(db.Model):
     """List of projects"""
     __tablename__ = "projects"

@@ -41,10 +41,10 @@
               </div>
               <button type="submit" class="btn btn-default" id="searchbutton" aria-label="Click to search"><span id="prod-search" class='glyphicon glyphicon-search' aria-hidden='true'></span></button>
             </form>
-            <li><a href="/locations">Locations</a></li>
             <li><a href="/projects">Projects</a></li>
             <li><a href="/account">Account</a></li>
             <li><a href="/contacts">Contact Us</a></li>
+            <li><a href="/profile">Profile</a></li>
             {% if 'email' in session %}
               <li><a href="/logout">Log Out</a></li>
             {% else %}
@@ -139,10 +139,11 @@
 <footer>
   <nav>
     <ul id='list'>
-        <li><a href="contacts.html"> Contact Us</a></li>
-        <li><a href="/locations">Locations</a></li>
+        <li><a href="/contacts"> Contact Us</a></li>
         <li><a href="/projects">projects</a></li>
         <li><a href="/account">Account</a></li>
+        <li><a href="/profile">profile</a></li>
+
       </ul>    
   </nav>
 </footer> 
